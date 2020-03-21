@@ -82,7 +82,10 @@ def rwloop(cache):
         item_info = market_request("items/"+match["url_name"])
         item_stats = market_request("items/"+match["url_name"]+"/statistics")
         # process dict 
-        trading_tax = item_info["payload"]["item"]["items_in_set"][0]["trading_tax"] 
+        try:
+            trading_tax = item_info["payload"]["item"]["items_in_set"][0]["trading_tax"] 
+        except:
+            trading_tax = 0
         try:
             ducats = item_info["payload"]["item"]["items_in_set"][0]["ducats"]
         except:
