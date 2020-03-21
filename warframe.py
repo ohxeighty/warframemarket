@@ -91,6 +91,8 @@ def rwloop(cache):
         except:
             ducats = 0
         days = item_stats["payload"]["statistics_live"]["90days"]
+        if "mod_rank" in days[0]:
+            days = [day for day in days if day["mod_rank"] == 0]
         days.sort(key=lambda item:datetime.datetime.strptime(item["datetime"],"%Y-%m-%dT%H:00:00.000+00:00"))
         
         # take n last data points, then take their average median 
