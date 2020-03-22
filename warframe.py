@@ -3,6 +3,11 @@ import argparse
 import json
 import sys
 import datetime 
+
+# workaround for ansi codes
+import ctypes
+kernel32 = ctypes.windll.kernel32 
+kernel32.SetConsoleMode(kernel32.GetStdHandle(-11),7)
  
 parser = argparse.ArgumentParser(description="Warframe Trading Assistant")
 parser.add_argument("-v", "--verbose", action="store_true") 
