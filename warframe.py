@@ -77,7 +77,7 @@ def rwloop(cache):
                     matches = [item for item in cache if i in item["item_name"].lower()]
                 
                 if len(matches) == 0:
-                    eprint("No matches")
+                    eprint("No matches for " + i)
                     continue 
                 match = None
                 
