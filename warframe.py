@@ -23,7 +23,8 @@ n = 10
 class bcolors: 
     WARNING = "\033[93m"
     BOLD = "\033[1m"
-    GREEN = "\033[92m" 
+    GREEN = "\033[92m"
+    CYAN = "\033[96m"
     BLUE = "\033[94m"
     CLEAR = "\033[0m"
     RED = "\033[91m"
@@ -46,74 +47,99 @@ def market_request(path):
     iprint("Requesting: " + url) 
     r = requests.get(url) 
     return r.json()
-    
+
 def rwloop(cache): 
     global n # n datapoints 
     
     while 1:
-        i = input(": ").lower()
-        matches = []
-        # handle initials 
-        if len(i.split()) == sum([len(j) for j in i.split()]):
-            initials = i.split()
-            matches = [item for item in cache if initials == [j[0] for j in item["item_name"].lower().split() if j[0] != "("]]
+        ui = input(": ").lower()
+        if ui and ui[0] == "!":
+            if ui[1:] == "help":
+                bprint("Commands are prefaced by !")
+                bprint("!refresh - Rebuild the item cache")
+            elif ui[1:] == "refresh":
+                iprint("Building item cache...")
+                cache = market_request("items")["payload"]["items"]
+                iprint("Built item cache")
         else:
-            # query cache 
-            #matches = next(item for item in cache if i in item["item_name"]) 
-            matches = [item for item in cache if i in item["item_name"].lower()]
-        
-        match = None
-        
-        # handle multiple matches
-        if len(matches) > 1:
-            bprint("Multiple Items Matched - Type Index of Desired Item") 
-            for index,m in enumerate(matches):
-                gprint("["+str(index)+"] " + m["item_name"]) 
-            while match == None:
-                try:
-                    i = input(": ")
-                    i = int(i) 
-                    match = matches[i] 
-                except KeyboardInterrupt:
-                    sys.exit()
-                except:
-                    eprint("Invalid index")
+            for i in [x.strip() for x in ui.split(",")]: 
+                matches = []
+                # handle initials 
+                if len(i.split()) == sum([len(j) for j in i.split()]):
+                    initials = i.split()
+                    matches = [item for item in cache if initials == [j[0] for j in item["item_name"].lower().split() if j[0] != "("]]
+                else:
+                    # query cache 
+                    #matches = next(item for item in cache if i in item["item_name"]) 
+                    matches = [item for item in cache if i in item["item_name"].lower()]
                 
-        elif len(matches) == 1:
-            match = matches[0] 
-        else: 
-            continue  
-        # query market 
-        item_info = market_request("items/"+match["url_name"])
-        item_stats = market_request("items/"+match["url_name"]+"/statistics")
-        # process dict 
-        try:
-            trading_tax = item_info["payload"]["item"]["items_in_set"][0]["trading_tax"] 
-        except:
-            trading_tax = 0
-        try:
-            ducats = item_info["payload"]["item"]["items_in_set"][0]["ducats"]
-        except:
-            ducats = 0
-        days = item_stats["payload"]["statistics_closed"]["90days"] # STATISTICS CLOSED OR LIVE??
-        if "mod_rank" in days[0]:
-            days = [day for day in days if day["mod_rank"] == 0]
-        days.sort(key=lambda item:datetime.datetime.strptime(item["datetime"],"%Y-%m-%dT%H:00:00.000+00:00"))
-        
-        # take n last data points, then take their average median 
-        if not len(days) <= n: 
-            days = days[-n:]
-        median = sum([day["median"] for day in days]) / len(days)
-        mean = sum([day["avg_price"] for day in days]) / len(days)
-        
-        bprint("===Statistics===")
-        gprint("Median value over past " + str(n) + " datapoints: " + "\033[94m" + str(median))
-        gprint("Median value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + "\033[94m" +str(days[-1]["median"]))
-        gprint("Mean value over past " + str(n) + " datapoints: " + "\033[94m" + str(mean)) 
-        gprint("Mean value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + "\033[94m" +str(days[-1]["avg_price"]))
-        if ducats != 0:
-            gprint("Ducat Value: " + "\033[94m" + str(ducats)) 
-        gprint("Trading Tax: " + "\033[94m" + str(trading_tax))    
+                if len(matches) == 0:
+                    eprint("No matches")
+                    continue 
+                match = None
+                
+                # handle multiple matches
+                if len(matches) > 1:
+                    bprint("Multiple Items Matched - Type Index of Desired Item") 
+                    gprint("[-1] " + "Back") 
+                    for index,m in enumerate(matches):
+                        gprint("["+str(index)+"] " + m["item_name"]) 
+                    while not match:
+                        try:
+                            i = input(": ")
+                            i = int(i) 
+                            if i == -1:
+                                break
+                            match = matches[i] 
+                        except KeyboardInterrupt:
+                            sys.exit()
+                        except:
+                            eprint("Invalid index")
+                        
+                elif len(matches) == 1:
+                    match = matches[0] 
+                else: 
+                    continue  
+                    
+                if not match:
+                    continue 
+                # query market 
+                item_info = market_request("items/"+match["url_name"])
+                item_stats = market_request("items/"+match["url_name"]+"/statistics")
+                
+                #the actual item we want... any request for an item thats part of a set gets a response for that whole set...
+                item_info_list = item_info["payload"]["item"]["items_in_set"]
+                item_info = next(item for item in item_info_list if item["en"]["item_name"] == match["item_name"])
+                
+                # process dict 
+                try:
+                    trading_tax = item_info["trading_tax"]
+                except:
+                    trading_tax = 0
+                try:
+                    ducats = item_info["ducats"]
+                except:
+                    ducats = 0
+                days = item_stats["payload"]["statistics_closed"]["90days"] # STATISTICS CLOSED OR LIVE??
+                if "mod_rank" in days[0]:
+                    days = [day for day in days if day["mod_rank"] == 0]
+                days.sort(key=lambda item:datetime.datetime.strptime(item["datetime"],"%Y-%m-%dT%H:00:00.000+00:00"))
+                
+                # take n last data points, then take their average median 
+                if not len(days) <= n: 
+                    days = days[-n:]
+                median = sum([day["median"] for day in days]) / len(days)
+                mean = sum([day["avg_price"] for day in days]) / len(days)
+                
+                bprint("===" + match["item_name"] + "===")
+                gprint("Median value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(median))
+                gprint("Median value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["median"]))
+                gprint("Mean value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(mean)) 
+                gprint("Mean value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["avg_price"]))
+                if ducats != 0:
+                    gprint("Ducat Value: " + bcolors.CYAN + str(ducats)) 
+                if trading_tax != 0:
+                    gprint("Trading Tax: " + bcolors.CYAN + str(trading_tax))    
 # Build item cache 
 iprint("Building item cache...")
     
