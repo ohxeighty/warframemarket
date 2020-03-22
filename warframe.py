@@ -52,15 +52,18 @@ def rwloop(cache):
     global n # n datapoints 
     
     while 1:
-        ui = input(": ").lower()
+        ui = input("Item: ").lower()
         if ui and ui[0] == "!":
             if ui[1:] == "help":
-                bprint("Commands are prefaced by !")
                 bprint("!refresh - Rebuild the item cache")
+                bprint("!quit - quit") 
             elif ui[1:] == "refresh":
                 iprint("Building item cache...")
                 cache = market_request("items")["payload"]["items"]
                 iprint("Built item cache")
+            elif ui[1:] == "quit":
+                bprint("Bye")
+                sys.exit()
         else:
             for i in [x.strip() for x in ui.split(",")]: 
                 matches = []
@@ -86,7 +89,7 @@ def rwloop(cache):
                         gprint("["+str(index)+"] " + m["item_name"]) 
                     while not match:
                         try:
-                            i = input(": ")
+                            i = input("Index: ")
                             i = int(i) 
                             if i == -1:
                                 break
