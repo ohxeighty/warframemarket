@@ -133,12 +133,15 @@ def rwloop(cache):
                     days = days[-n:]
                 median = sum([day["median"] for day in days]) / len(days)
                 mean = sum([day["avg_price"] for day in days]) / len(days)
+                volume = sum([day["volume"] for day in days]) / len(days) 
                 
                 bprint("===" + match["item_name"] + "===")
                 gprint("Median value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(median))
                 gprint("Median value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["median"]))
                 gprint("Mean value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(mean)) 
                 gprint("Mean value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["avg_price"]))
+                gprint("Average volume sold over past " + str(n) + " datapoints: " + bcolors.CYAN + str(volume)) 
+                gprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["volume"]))
                 if ducats != 0:
                     gprint("Ducat Value: " + bcolors.CYAN + str(ducats)) 
                 if trading_tax != 0:
