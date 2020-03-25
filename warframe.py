@@ -26,6 +26,7 @@ class bcolors:
     GREEN = "\033[92m"
     CYAN = "\033[96m"
     BLUE = "\033[94m"
+    YELLOW = "\33[33m" 
     CLEAR = "\033[0m"
     RED = "\033[91m"
     
@@ -140,12 +141,12 @@ def rwloop(cache):
                 gprint("Median value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["median"]))
                 gprint("Mean value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(mean)) 
                 gprint("Mean value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["avg_price"]))
-                gprint("Average volume sold over past " + str(n) + " datapoints: " + bcolors.CYAN + str(volume)) 
-                gprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["volume"]))
                 if ducats != 0:
                     gprint("Ducat Value: " + bcolors.CYAN + str(ducats)) 
                 if trading_tax != 0:
                     gprint("Trading Tax: " + bcolors.CYAN + str(trading_tax))    
+                gprint("Average volume sold over past " + str(n) + " datapoints: " + bcolors.YELLOW + str(volume)) 
+                gprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.YELLOW +str(days[-1]["volume"]))
 # Build item cache 
 iprint("Building item cache...")
     
