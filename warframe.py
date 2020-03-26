@@ -138,14 +138,22 @@ def rwloop(cache):
                 median = sum([day["median"] for day in days]) / len(days)
                 mean = sum([day["avg_price"] for day in days]) / len(days)
                 volume = sum([day["volume"] for day in days]) / len(days) 
-               
+                volume_l = days[-1]["volume"]
                 # color code volume based on sales 
-                if volume < 5: 
+                if volume < 50: 
                     volume_str = bcolors.RED + str(volume) 
-                elif volume < 10: 
+                elif volume < 100: 
                     volume_str = bcolors.YELLOW + str(volume) 
                 else:
                     volume_str = bcolors.GREEN + str(volume) 
+                
+                if volume_l < 5: 
+                    volume_str_l = bcolors.RED + str(volume_l) 
+                elif volume_l < 10: 
+                    volume_str_l = bcolors.YELLOW + str(volume_l) 
+                else:
+                    volume_str_l = bcolors.GREEN + str(volume_l)
+                
                 
                 bprint("===" + match["item_name"] + "===")
                 gprint("Median value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(median))
@@ -158,7 +166,7 @@ def rwloop(cache):
                     gprint("Trading Tax: " + bcolors.CYAN + str(trading_tax))    
 
                 cprint("Average volume sold over past " + str(n) + " datapoints: " + volume_str) 
-                cprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.YELLOW +str(days[-1]["volume"]))
+                cprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + volume_str_l)
 # Build item cache 
 iprint("Building item cache...")
     
