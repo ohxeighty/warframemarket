@@ -42,7 +42,10 @@ def bprint(text):
 
 def gprint(text):
     print(bcolors.GREEN + text + bcolors.CLEAR) 
-    
+
+def cprint(text):
+    print(bcolors.CYAN + text + bcolors.CLEAR) 
+
 def market_request(path):
     url="https://api.warframe.market/v1/" + path 
     iprint("Requesting: " + url) 
@@ -135,6 +138,14 @@ def rwloop(cache):
                 median = sum([day["median"] for day in days]) / len(days)
                 mean = sum([day["avg_price"] for day in days]) / len(days)
                 volume = sum([day["volume"] for day in days]) / len(days) 
+               
+                # color code volume based on sales 
+                if volume < 5: 
+                    volume_str = bcolors.RED + str(volume) 
+                elif volume < 10: 
+                    volume_str = bcolors.YELLOW + str(volume) 
+                else:
+                    volume_str = bcolors.GREEN + str(volume) 
                 
                 bprint("===" + match["item_name"] + "===")
                 gprint("Median value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(median))
@@ -145,12 +156,14 @@ def rwloop(cache):
                     gprint("Ducat Value: " + bcolors.CYAN + str(ducats)) 
                 if trading_tax != 0:
                     gprint("Trading Tax: " + bcolors.CYAN + str(trading_tax))    
-                gprint("Average volume sold over past " + str(n) + " datapoints: " + bcolors.YELLOW + str(volume)) 
-                gprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.YELLOW +str(days[-1]["volume"]))
+
+                cprint("Average volume sold over past " + str(n) + " datapoints: " + volume_str) 
+                cprint("Volume sold on " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.YELLOW +str(days[-1]["volume"]))
 # Build item cache 
 iprint("Building item cache...")
     
 item_cache = market_request("items")["payload"]["items"]
+item_cache.sort(key=lambda i:(i["item_name"]))
 iprint("Built item cache")
 # Main loop 
 rwloop(item_cache) 
