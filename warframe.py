@@ -64,6 +64,7 @@ def rwloop(cache):
             elif ui[1:] == "refresh":
                 iprint("Building item cache...")
                 cache = market_request("items")["payload"]["items"]
+                item_cache.sort(key=lambda i:(i["item_name"]))
                 iprint("Built item cache")
             elif ui[1:] == "quit":
                 bprint("Bye")
@@ -135,14 +136,16 @@ def rwloop(cache):
                 # take n last data points, then take their average median 
                 if not len(days) <= n: 
                     days = days[-n:]
+                    
+
                 median = sum([day["median"] for day in days]) / len(days)
                 mean = sum([day["avg_price"] for day in days]) / len(days)
                 volume = sum([day["volume"] for day in days]) / len(days) 
                 volume_l = days[-1]["volume"]
                 # color code volume based on sales 
-                if volume < 50: 
+                if volume < 5: 
                     volume_str = bcolors.RED + str(volume) 
-                elif volume < 100: 
+                elif volume < 10: 
                     volume_str = bcolors.YELLOW + str(volume) 
                 else:
                     volume_str = bcolors.GREEN + str(volume) 
