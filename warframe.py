@@ -144,11 +144,11 @@ def rwloop(cache):
                 volume_l = days[-1]["volume"]
                 # color code volume based on sales 
                 if volume < 5: 
-                    volume_str = bcolors.RED + str(volume) 
+                    volume_str = bcolors.RED + "%.3f"%volume
                 elif volume < 10: 
-                    volume_str = bcolors.YELLOW + str(volume) 
+                    volume_str = bcolors.YELLOW + "%.3f"%volume 
                 else:
-                    volume_str = bcolors.GREEN + str(volume) 
+                    volume_str = bcolors.GREEN + "%.3f"%volume 
                 
                 if volume_l < 5: 
                     volume_str_l = bcolors.RED + str(volume_l) 
@@ -159,9 +159,9 @@ def rwloop(cache):
                 
                 
                 bprint("===" + match["item_name"] + "===")
-                gprint("Median value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(median))
+                gprint("Median value over past " + str(n) + " datapoints: " + bcolors.CYAN + "%.3f"%median)
                 gprint("Median value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["median"]))
-                gprint("Mean value over past " + str(n) + " datapoints: " + bcolors.CYAN + str(mean)) 
+                gprint("Mean value over past " + str(n) + " datapoints: " + bcolors.CYAN + "%.3f"%mean) 
                 gprint("Mean value from " + str(days[-1]["datetime"]).split(":")[0] + ": " + bcolors.CYAN +str(days[-1]["avg_price"]))
                 if ducats != 0:
                     gprint("Ducat Value: " + bcolors.CYAN + str(ducats)) 
